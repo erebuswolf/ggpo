@@ -8,6 +8,7 @@
 #include "types.h"
 #include "udp_proto.h"
 #include "bitvector.h"
+#include "connection_manager.h"
 
 static const int UDP_HEADER_SIZE = 28;     /* Size of IP + UDP headers */
 static const int NUM_SYNC_PACKETS = 5;
@@ -67,8 +68,9 @@ void
 UdpProtocol::Init(Udp *udp,
                   Poll &poll,
                   int queue,
-                  char *ip,
-                  int port,
+                  /*char *ip,
+                  int port,*/
+				  ConnectionInfo* connection,
                   UdpMsg::connect_status *status)
 {  
    _udp = udp;

@@ -101,7 +101,7 @@ Udp::OnLoopPoll(void *cookie)
          Log("recvfrom returned (len:%d  from:%s:%d).\n", len,inet_ntoa(recv_addr.sin_addr), ntohs(recv_addr.sin_port) );
          UdpMsg *msg = (UdpMsg *)recv_buf;
          _callbacks->OnMsg(recv_addr, msg, len);
-      } 
+      }
    }
    return true;
 }

@@ -15,6 +15,7 @@
 #include "timesync.h"
 #include "ggponet.h"
 #include "ring_buffer.h"
+#include "connection_manager.h"
 
 class UdpProtocol : public IPollSink
 {
@@ -63,7 +64,7 @@ public:
    UdpProtocol();
    virtual ~UdpProtocol();
 
-   void Init(Udp *udp, Poll &p, int queue, char *ip, int port, UdpMsg::connect_status *status);
+   void Init(Udp *udp, Poll &p, int queue, /*char *ip, int port,*/ ConnectionInfo* connection, UdpMsg::connect_status *status);
 
    void Synchronize();
    bool GetPeerConnectStatus(int id, int *frame);
@@ -126,6 +127,7 @@ protected:
    /*
     * Network transmission information
     */
+   ConnectionInfo* connection;
    Udp            *_udp;
    sockaddr_in    _peer_addr; 
    uint16         _magic_number;
