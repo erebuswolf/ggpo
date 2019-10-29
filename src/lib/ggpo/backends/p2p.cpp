@@ -13,6 +13,7 @@ static const int DEFAULT_DISCONNECT_NOTIFY_START   = 750;
 
 Peer2PeerBackend::Peer2PeerBackend(GGPOSessionCallbacks *cb,
                                    const char *gamename,
+								   ConnectionManager* connection_manager,
                                    int localport,
                                    int num_players,
                                    int input_size) :
@@ -27,7 +28,7 @@ Peer2PeerBackend::Peer2PeerBackend(GGPOSessionCallbacks *cb,
    _callbacks = *cb;
    _synchronizing = true;
    _next_recommended_sleep = 0;
-
+   _connection_manager = connection_manager;
    /*
     * Initialize the synchronziation layer
     */
@@ -41,7 +42,7 @@ Peer2PeerBackend::Peer2PeerBackend(GGPOSessionCallbacks *cb,
    /*
     * Initialize the UDP port
     */
-   _udp.Init(localport, &_poll, this);
+   _udp.Init(localport, &_poll, this, connection_manager);
 
    _endpoints = new UdpProtocol[_num_players];
    memset(_local_connect_status, 0, sizeof(_local_connect_status));
@@ -581,16 +582,16 @@ Peer2PeerBackend::PlayerHandleToQueue(GGPOPlayerHandle player, int *queue)
 
  
 void
-Peer2PeerBackend::OnMsg(sockaddr_in &from, UdpMsg *msg, int len)
+Peer2PeerBackend::OnMsg(int connection_id, UdpMsg *msg, int len)
 {
    for (int i = 0; i < _num_players; i++) {
-      if (_endpoints[i].HandlesMsg(from, msg)) {
+      if (_endpoints[i].HandlesMsg(connection_id, msg)) {
          _endpoints[i].OnMsg(msg, len);
          return;
       }
    }
    for (int i = 0; i < _num_spectators; i++) {
-      if (_spectators[i].HandlesMsg(from, msg)) {
+      if (_spectators[i].HandlesMsg(connection_id, msg)) {
          _spectators[i].OnMsg(msg, len);
          return;
       }

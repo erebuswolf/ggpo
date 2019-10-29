@@ -14,10 +14,11 @@
 #include "backend.h"
 #include "timesync.h"
 #include "network/udp_proto.h"
+#include "network/connection_manager.h"
 
 class Peer2PeerBackend : public IQuarkBackend, IPollSink, Udp::Callbacks {
 public:
-   Peer2PeerBackend(GGPOSessionCallbacks *cb, const char *gamename, int localport, int num_players, int input_size);
+   Peer2PeerBackend(GGPOSessionCallbacks *cb, const char *gamename, ConnectionManager* connection_manager, int localport, int num_players, int input_size);
    virtual ~Peer2PeerBackend();
 
 
@@ -34,7 +35,7 @@ public:
    virtual GGPOErrorCode SetDisconnectNotifyStart(int timeout);
 
 public:
-   virtual void OnMsg(sockaddr_in &from, UdpMsg *msg, int len);
+   virtual void OnMsg(int connection_id, UdpMsg *msg, int len);
 
 protected:
    GGPOErrorCode PlayerHandleToQueue(GGPOPlayerHandle player, int *queue);
@@ -57,6 +58,7 @@ protected:
    GGPOSessionCallbacks  _callbacks;
    Poll                  _poll;
    Sync                  _sync;
+   ConnectionManager*    _connection_manager;
    Udp                   _udp;
    UdpProtocol           *_endpoints;
    UdpProtocol           _spectators[GGPO_MAX_SPECTATORS];

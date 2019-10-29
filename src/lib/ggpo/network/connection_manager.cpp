@@ -2,15 +2,14 @@
 #include "types.h"
 #include "connection_manager.h"
 
+ConnectionManager::ConnectionManager() : _id_to_issue(0) {}
 
 UDPConnectionManager::UDPConnectionManager() {}
 
-
-int UDPConnectionManager::AddConnection(struct sockaddr* dst, int destlen) {
-	return -1;
-}
-
 int UDPConnectionManager::SendTo(char* buffer, int len, int flags, int connection_id) {
+
+//	ASSERT(entry.dest_addr.sin_addr.s_addr);
+
 	/*
 	struct sockaddr_in* to = (struct sockaddr_in*)dst;
 
@@ -26,7 +25,7 @@ int UDPConnectionManager::SendTo(char* buffer, int len, int flags, int connectio
 	return 0;
 }
 
-int UDPConnectionManager::recvfrom(char* buffer, int len, int flags, int& connection_id) {
+int UDPConnectionManager::RecvFrom(char* buffer, int len, int flags, int* connection_id) {
 	//set the connection id to the connection we recieved the data from.
 
 	// resolve the address via the connection ID
@@ -48,18 +47,31 @@ int UDPConnectionManager::recvfrom(char* buffer, int len, int flags, int& connec
 	return 0;
 }
 
+int UDPConnectionManager::AddConnection(char* ip_address, short port) {
+	/*
+	_peer_addr.sin_family = AF_INET;
+	_peer_addr.sin_addr.s_addr = inet_addr(ip);
+	_peer_addr.sin_port = htons(port);
+	*/
+
+	sockaddr_in dest_addr;
+	return ConnectionManager::AddConnection(BuildConnectionInfo(ip_address, port));
+}
+
+std::shared_ptr<ConnectionInfo> UDPConnectionManager::BuildConnectionInfo(char* ip_address, short port) {
+
+	return std::shared_ptr<ConnectionInfo>((ConnectionInfo*) new udp_info(ip_address, port));
+}
+
+//////////////////// STEAM Connection
 
 SteamConnectionManager::SteamConnectionManager() {}
 
 int SteamConnectionManager::SendTo(char* buffer, int len, int flags, int connection_id) {
+
 	return -1;
 }
 
-int SteamConnectionManager::recvfrom(char* buffer, int len, int flags, int connection_id) {
-	return -1;
-}
-
-//returns the connection id of the added connection;
-int AddConnection(/*HSteamNetConnection connection*/) {
+int SteamConnectionManager::RecvFrom(char* buffer, int len, int flags, int* connection_id) {
 	return -1;
 }

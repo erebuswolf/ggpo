@@ -52,10 +52,10 @@ Udp::~Udp(void)
 }
 
 void
-Udp::Init(int port, Poll *poll, Callbacks *callbacks)
+Udp::Init(int port, Poll *poll, Callbacks *callbacks, ConnectionManager* connection_manager)
 {
    _callbacks = callbacks;
-
+   _connection_manager = connection_manager;
    _poll = poll;
    _poll->RegisterLoop(this);
 
@@ -66,7 +66,7 @@ Udp::Init(int port, Poll *poll, Callbacks *callbacks)
 void
 Udp::SendTo(char *buffer, int len, int flags, int connection_id /*struct sockaddr *dst, int destlen*/)
 {
-   int res = _connectionManager->SendTo(buffer, len, flags, connection_id);
+   int res = _connection_manager->SendTo(buffer, len, flags, connection_id);
 
    if (res == SOCKET_ERROR) {
       DWORD err = WSAGetLastError();
@@ -86,7 +86,8 @@ Udp::OnLoopPoll(void *cookie)
 
    for (;;) {
       recv_addr_len = sizeof(recv_addr);
-      int len = recvfrom(_socket, (char *)recv_buf, MAX_UDP_PACKET_SIZE, 0, (struct sockaddr *)&recv_addr, &recv_addr_len);
+	  int connection_id = -1;
+	  int len = _connection_manager->RecvFrom((char*)recv_buf, MAX_UDP_PACKET_SIZE, 0, &connection_id);
 
       // TODO: handle len == 0... indicates a disconnect.
 
@@ -97,9 +98,10 @@ Udp::OnLoopPoll(void *cookie)
          }
          break;
       } else if (len > 0) {
-         Log("recvfrom returned (len:%d  from:%s:%d).\n", len,inet_ntoa(recv_addr.sin_addr), ntohs(recv_addr.sin_port) );
+		 //TODO(erebus): make connection manager return an info string on the connection id.
+         Log("recvfrom returned (len:%d  from:%s:%d).\n", len, inet_ntoa(recv_addr.sin_addr), ntohs(recv_addr.sin_port) );
          UdpMsg *msg = (UdpMsg *)recv_buf;
-         _callbacks->OnMsg(recv_addr, msg, len);
+         _callbacks->OnMsg(connection_id, msg, len);
       }
    }
    return true;

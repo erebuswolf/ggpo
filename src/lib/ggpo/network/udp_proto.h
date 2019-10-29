@@ -73,7 +73,7 @@ public:
    bool IsRunning() { return _current_state == Running; }
    void SendInput(GameInput &input);
    void SendInputAck();
-   bool HandlesMsg(sockaddr_in &from, UdpMsg *msg);
+   bool HandlesMsg(int connection_id, UdpMsg *msg);
    void OnMsg(UdpMsg *msg, int len);
    void Disconnect();
   
@@ -96,11 +96,10 @@ protected:
    struct QueueEntry {
       int         queue_time;
 	  int		  connection_id;
-      sockaddr_in dest_addr;
       UdpMsg      *msg;
 
       QueueEntry() {}
-      QueueEntry(int time, sockaddr_in &dst, UdpMsg *m) : queue_time(time), dest_addr(dst), msg(m) { }
+      QueueEntry(int time, int conn_id, UdpMsg *m) : queue_time(time), connection_id(conn_id), msg(m) { }
    };
 
    bool CreateSocket(int retries);
@@ -130,6 +129,7 @@ protected:
     */
    ConnectionManager* connection_manager;
    Udp            *_udp;
+   int            _connection_id;
    sockaddr_in    _peer_addr; 
    uint16         _magic_number;
    int            _queue;

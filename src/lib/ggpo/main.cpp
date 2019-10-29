@@ -10,6 +10,7 @@
 #include "backends/synctest.h"
 #include "backends/spectator.h"
 #include "ggponet.h"
+#include "network/connection_manager.h"
 
 BOOL WINAPI
 DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
@@ -38,6 +39,7 @@ ggpo_logv(GGPOSession *ggpo, const char *fmt, va_list args)
 GGPOErrorCode
 ggpo_start_session(GGPOSession **session,
                    GGPOSessionCallbacks *cb,
+	ConnectionManager* connection_manager,
                    const char *game,
                    int num_players,
                    int input_size,
@@ -45,6 +47,7 @@ ggpo_start_session(GGPOSession **session,
 {
    *session= (GGPOSession *)new Peer2PeerBackend(cb,
                                                  game,
+												 connection_manager,
                                                  localport,
                                                  num_players,
                                                  input_size);
@@ -189,6 +192,7 @@ ggpo_set_disconnect_notify_start(GGPOSession *ggpo, int timeout)
 
 GGPOErrorCode ggpo_start_spectating(GGPOSession **session,
                                     GGPOSessionCallbacks *cb,
+									ConnectionManager* connection_manager,
                                     const char *game,
                                     int num_players,
                                     int input_size,
@@ -197,6 +201,7 @@ GGPOErrorCode ggpo_start_spectating(GGPOSession **session,
 {
    *session= (GGPOSession *)new SpectatorBackend(cb,
                                                  game,
+												 0,
                                                  local_port,
                                                  num_players,
                                                  input_size,

@@ -29,7 +29,7 @@ public:
 
    struct Callbacks {
       virtual ~Callbacks() { }
-      virtual void OnMsg(sockaddr_in &from, UdpMsg *msg, int len) = 0;
+      virtual void OnMsg(int connection_id, UdpMsg *msg, int len) = 0;
    };
 
 
@@ -39,7 +39,7 @@ protected:
 public:
    Udp();
 
-   void Init(int port, Poll *p, Callbacks *callbacks);
+   void Init(int port, Poll *p, Callbacks *callbacks, ConnectionManager* connectionManager);
    
    void SendTo(char *buffer, int len, int flags, int connection_id /*struct sockaddr *dst, int destlen*/);
 
@@ -49,7 +49,7 @@ public:
    ~Udp(void);
 
 protected:
-   ConnectionManager *_connectionManager;
+   ConnectionManager *_connection_manager;
    // Network transmission information
    SOCKET         _socket;
 

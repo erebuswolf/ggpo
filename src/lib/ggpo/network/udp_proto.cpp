@@ -77,6 +77,7 @@ UdpProtocol::Init(Udp *udp,
    _queue = queue;
    _local_connect_status = status;
 
+   _connection_id = connection_id;
    /*
    _peer_addr.sin_family = AF_INET;
    _peer_addr.sin_addr.s_addr = inet_addr(ip);
@@ -289,19 +290,18 @@ UdpProtocol::SendMsg(UdpMsg *msg)
    msg->hdr.magic = _magic_number;
    msg->hdr.sequence_number = _next_send_seq++;
 
-   _send_queue.push(QueueEntry(timeGetTime(), _peer_addr, msg));
+   _send_queue.push(QueueEntry(timeGetTime(), _connection_id, msg));
    PumpSendQueue();
 }
 
 bool
-UdpProtocol::HandlesMsg(sockaddr_in &from,
+UdpProtocol::HandlesMsg(int connection_id,
                         UdpMsg *msg)
 {
    if (!_udp) {
       return false;
    }
-   return _peer_addr.sin_addr.S_un.S_addr == from.sin_addr.S_un.S_addr &&
-          _peer_addr.sin_port == from.sin_port;
+   return _connection_id == connection_id;
 }
 
 void
@@ -738,7 +738,6 @@ UdpProtocol::PumpSendQueue()
          _oo_packet.msg = entry.msg;
          _oo_packet.connection_id = entry.connection_id;
       } else {
-         ASSERT(entry.dest_addr.sin_addr.s_addr);
 		 //(struct sockaddr*)& entry.dest_addr, sizeof entry.dest_addr
          _udp->SendTo((char *)entry.msg, entry.msg->PacketSize(), 0, entry.connection_id);
 

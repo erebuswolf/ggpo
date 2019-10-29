@@ -9,10 +9,11 @@
 #define _GGPONET_H_
 
 #ifdef __cplusplus
-extern "C" {
+//extern "C" {
 #endif
 
 #include <stdarg.h>
+#include "network/connection_manager.h"
 
 #define GGPO_MAX_PLAYERS                  4
 #define GGPO_MAX_PREDICTION_FRAMES        8
@@ -306,6 +307,7 @@ typedef struct GGPONetworkStats {
  */
 __declspec(dllexport) GGPOErrorCode __cdecl ggpo_start_session(GGPOSession **session,
                                                                GGPOSessionCallbacks *cb,
+															   ConnectionManager* connection_manager,
                                                                const char *game,
                                                                int num_players,
                                                                int input_size,
@@ -386,12 +388,12 @@ __declspec(dllexport) GGPOErrorCode __cdecl ggpo_start_synctest(GGPOSession **se
  */
 __declspec(dllexport) GGPOErrorCode __cdecl ggpo_start_spectating(GGPOSession **session,
                                                                   GGPOSessionCallbacks *cb,
+																  ConnectionManager* connection_manager,
                                                                   const char *game,
                                                                   int num_players,
                                                                   int input_size,
                                                                   int local_port,
-                                                                  char *host_ip,
-                                                                  int host_port);
+                                                                  int connection_id);
 
 /*
  * ggpo_close_session --
@@ -546,7 +548,7 @@ __declspec(dllexport) void __cdecl ggpo_logv(GGPOSession *,
                                              va_list args);
 
 #ifdef __cplusplus
-};
+//};
 #endif
 
 #endif
