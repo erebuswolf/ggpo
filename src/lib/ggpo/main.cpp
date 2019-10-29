@@ -193,16 +193,14 @@ GGPOErrorCode ggpo_start_spectating(GGPOSession **session,
                                     int num_players,
                                     int input_size,
                                     int local_port,
-                                    char *host_ip,
-                                    int host_port)
+                                    int connection_id)
 {
    *session= (GGPOSession *)new SpectatorBackend(cb,
                                                  game,
                                                  local_port,
                                                  num_players,
                                                  input_size,
-                                                 host_ip,
-                                                 host_port);
+                                                 connection_id);
    return GGPO_OK;
 }
 

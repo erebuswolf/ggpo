@@ -12,8 +12,7 @@ SpectatorBackend::SpectatorBackend(GGPOSessionCallbacks *cb,
                                    int localport,
                                    int num_players,
                                    int input_size,
-                                   char *hostip,
-                                   int hostport) :
+                                   int connection_id) :
    _num_players(num_players),
    _input_size(input_size),
    _next_input_to_send(0)
@@ -33,7 +32,7 @@ SpectatorBackend::SpectatorBackend(GGPOSessionCallbacks *cb,
    /*
     * Init the host endpoint
     */
-   _host.Init(&_udp, _poll, 0, hostip, hostport, NULL);
+   _host.Init(&_udp, _poll, 0, connection_id, NULL);
    _host.Synchronize();
 
    /*

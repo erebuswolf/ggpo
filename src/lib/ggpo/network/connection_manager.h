@@ -1,25 +1,39 @@
 #pragma once
 
-class ConnectionInfo {
-	virtual void SendTo(char* buffer, int len, int flags, int connection_id) = 0;
-	//struct sockaddr* dst, int destlen store these in a udp class
-};
-
-class ConnectionManager
-{
-	virtual void SendTo(char* buffer, int len, int flags, int connection_id) = 0;
+class ConnectionManager {
+public:
+	virtual int SendTo(char* buffer, int len, int flags, int connection_id) = 0;
 	//struct sockaddr* dst, int destlen store these in a udp class
 
-	virtual void AddConnection(int connection_id, ConnectionInfo *) = 0;
+	virtual int RecvFrom(char* buffer, int len, int flags, int connection_id) = 0;
+
+	virtual int ResetManager() = 0;
+
 };
 
 
-class UDPConnection : ConnectionInfo {
-	UDPConnection();
-	UDPConnection(struct sockaddr* dst, int destlen);
+class UDPConnectionManager : ConnectionManager {
 
-	virtual void SendTo(char* buffer, int len, int flags, int connection_id);
+public:
+	UDPConnectionManager();
 
-	struct sockaddr* dst;
-	int destlen;
+	virtual int SendTo(char* buffer, int len, int flags, int connection_id);
+
+	virtual int recvfrom(char* buffer, int len, int flags, int& connection_id);
+
+	//returns the connection id of the added connection;
+	virtual int AddConnection(struct sockaddr* dst, int destlen);
+};
+
+class SteamConnectionManager : ConnectionManager {
+
+public:
+	SteamConnectionManager();
+
+	virtual int SendTo(char* buffer, int len, int flags, int connection_id);
+
+	virtual int recvfrom(char* buffer, int len, int flags, int connection_id);
+
+	//returns the connection id of the added connection;
+	virtual int AddConnection(/*HSteamNetConnection connection*/);
 };

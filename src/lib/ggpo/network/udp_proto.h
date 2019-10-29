@@ -64,7 +64,7 @@ public:
    UdpProtocol();
    virtual ~UdpProtocol();
 
-   void Init(Udp *udp, Poll &p, int queue, /*char *ip, int port,*/ ConnectionInfo* connection, UdpMsg::connect_status *status);
+   void Init(Udp *udp, Poll &p, int queue, /*char *ip, int port,*/ int connection_id, UdpMsg::connect_status *status);
 
    void Synchronize();
    bool GetPeerConnectStatus(int id, int *frame);
@@ -95,6 +95,7 @@ protected:
    };
    struct QueueEntry {
       int         queue_time;
+	  int		  connection_id;
       sockaddr_in dest_addr;
       UdpMsg      *msg;
 
@@ -127,7 +128,7 @@ protected:
    /*
     * Network transmission information
     */
-   ConnectionInfo* connection;
+   ConnectionManager* connection_manager;
    Udp            *_udp;
    sockaddr_in    _peer_addr; 
    uint16         _magic_number;
@@ -138,6 +139,7 @@ protected:
    int            _oop_percent;
    struct {
       int         send_time;
+	  int		  connection_id;
       sockaddr_in dest_addr;
       UdpMsg*     msg;
    }              _oo_packet;

@@ -62,6 +62,7 @@ typedef struct GGPOPlayer {
       struct {
       } local;
       struct {
+		 int		 connection_id;
          char        ip_address[32];
          short       port;
       } remote;

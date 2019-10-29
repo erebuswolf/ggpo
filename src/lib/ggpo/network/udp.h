@@ -12,6 +12,7 @@
 #include "udp_msg.h"
 #include "ggponet.h"
 #include "ring_buffer.h"
+#include "connection_manager.h"
 
 #define MAX_UDP_ENDPOINTS     16
 
@@ -40,7 +41,7 @@ public:
 
    void Init(int port, Poll *p, Callbacks *callbacks);
    
-   void SendTo(char *buffer, int len, int flags, struct sockaddr *dst, int destlen);
+   void SendTo(char *buffer, int len, int flags, int connection_id /*struct sockaddr *dst, int destlen*/);
 
    virtual bool OnLoopPoll(void *cookie);
 
@@ -48,6 +49,7 @@ public:
    ~Udp(void);
 
 protected:
+   ConnectionManager *_connectionManager;
    // Network transmission information
    SOCKET         _socket;
 

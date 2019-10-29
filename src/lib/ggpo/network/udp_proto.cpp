@@ -70,17 +70,19 @@ UdpProtocol::Init(Udp *udp,
                   int queue,
                   /*char *ip,
                   int port,*/
-				  ConnectionInfo* connection,
+				  int connection_id,
                   UdpMsg::connect_status *status)
 {  
    _udp = udp;
    _queue = queue;
    _local_connect_status = status;
 
+   /*
    _peer_addr.sin_family = AF_INET;
    _peer_addr.sin_addr.s_addr = inet_addr(ip);
    _peer_addr.sin_port = htons(port);
-   
+   */
+
    do {
       _magic_number = rand();
    } while (_magic_number == 0);
@@ -734,12 +736,11 @@ UdpProtocol::PumpSendQueue()
          Log("creating rogue oop (seq: %d  delay: %d)\n", entry.msg->hdr.sequence_number, delay);
          _oo_packet.send_time = timeGetTime() + delay;
          _oo_packet.msg = entry.msg;
-         _oo_packet.dest_addr = entry.dest_addr;
+         _oo_packet.connection_id = entry.connection_id;
       } else {
          ASSERT(entry.dest_addr.sin_addr.s_addr);
-
-         _udp->SendTo((char *)entry.msg, entry.msg->PacketSize(), 0,
-                      (struct sockaddr *)&entry.dest_addr, sizeof entry.dest_addr);
+		 //(struct sockaddr*)& entry.dest_addr, sizeof entry.dest_addr
+         _udp->SendTo((char *)entry.msg, entry.msg->PacketSize(), 0, entry.connection_id);
 
          delete entry.msg;
       }
@@ -748,7 +749,7 @@ UdpProtocol::PumpSendQueue()
    if (_oo_packet.msg && _oo_packet.send_time < timeGetTime()) {
       Log("sending rogue oop!");
       _udp->SendTo((char *)_oo_packet.msg, _oo_packet.msg->PacketSize(), 0,
-                     (struct sockaddr *)&_oo_packet.dest_addr, sizeof _oo_packet.dest_addr);
+		  _oo_packet.connection_id);
 
       delete _oo_packet.msg;
       _oo_packet.msg = NULL;

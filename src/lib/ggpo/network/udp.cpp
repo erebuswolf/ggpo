@@ -64,18 +64,17 @@ Udp::Init(int port, Poll *poll, Callbacks *callbacks)
 }
 
 void
-Udp::SendTo(char *buffer, int len, int flags, struct sockaddr *dst, int destlen)
+Udp::SendTo(char *buffer, int len, int flags, int connection_id /*struct sockaddr *dst, int destlen*/)
 {
-   struct sockaddr_in *to = (struct sockaddr_in *)dst;
+   int res = _connectionManager->SendTo(buffer, len, flags, connection_id);
 
-   int res = sendto(_socket, buffer, len, flags, dst, destlen);
    if (res == SOCKET_ERROR) {
       DWORD err = WSAGetLastError();
       DWORD e2 = WSAENOTSOCK;
       Log("unknown error in sendto (erro: %d  wsaerr: %d).\n", res, err);
       ASSERT(FALSE && "Unknown error in sendto");
    }
-   Log("sent packet length %d to %s:%d (ret:%d).\n", len, inet_ntoa(to->sin_addr), ntohs(to->sin_port), res);
+  // Log("sent packet length %d to %s:%d (ret:%d).\n", len, inet_ntoa(to->sin_addr), ntohs(to->sin_port), res);
 }
 
 bool
