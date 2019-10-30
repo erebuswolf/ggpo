@@ -82,7 +82,7 @@ int UDPConnectionManager::SendTo(char* buffer, int len, int flags, int connectio
 		(struct sockaddr*) & ((std::dynamic_pointer_cast <udp_info>(dest_addr))->addr),
 		sizeof(std::dynamic_pointer_cast <udp_info>(dest_addr)->addr));
 
-	Log("trying to send %s).\n", ToString(connection_id));
+	Log("trying to send %s).\n", ToString(connection_id).c_str());
 	if (res == SOCKET_ERROR) {
 		DWORD err = WSAGetLastError();
 		DWORD e2 = WSAENOTSOCK;
