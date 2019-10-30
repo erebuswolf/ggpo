@@ -8,47 +8,16 @@
 #include "types.h"
 #include "udp.h"
 
-SOCKET
-CreateSocket(int bind_port, int retries)
-{
-   SOCKET s;
-   sockaddr_in sin;
-   int port;
-   int optval = 1;
-
-   s = socket(AF_INET, SOCK_DGRAM, 0);
-   setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const char *)&optval, sizeof optval);
-   setsockopt(s, SOL_SOCKET, SO_DONTLINGER, (const char *)&optval, sizeof optval);
-
-   // non-blocking...
-   u_long iMode = 1;
-   ioctlsocket(s, FIONBIO, &iMode);
-
-   sin.sin_family = AF_INET;
-   sin.sin_addr.s_addr = htonl(INADDR_ANY);
-   for (port = bind_port; port <= bind_port + retries; port++) {
-      sin.sin_port = htons(port);
-      if (bind(s, (sockaddr *)&sin, sizeof sin) != SOCKET_ERROR) {
-         Log("Udp bound to port: %d.\n", port);
-         return s;
-      }
-   }
-   closesocket(s);
-   return INVALID_SOCKET;
-}
 
 Udp::Udp() :
-   _socket(INVALID_SOCKET),
-   _callbacks(NULL)
+	_callbacks(NULL),
+	_connection_manager(),
+	_poll(NULL)
 {
 }
 
 Udp::~Udp(void)
 {
-   if (_socket != INVALID_SOCKET) {
-      closesocket(_socket);
-      _socket = INVALID_SOCKET;
-   }
 }
 
 void
@@ -60,7 +29,6 @@ Udp::Init(int port, Poll *poll, Callbacks *callbacks, ConnectionManager* connect
    _poll->RegisterLoop(this);
 
    Log("binding udp socket to port %d.\n", port);
-   _socket = CreateSocket(port, 0);
 }
 
 void
@@ -68,13 +36,6 @@ Udp::SendTo(char *buffer, int len, int flags, int connection_id /*struct sockadd
 {
    int res = _connection_manager->SendTo(buffer, len, flags, connection_id);
 
-   if (res == SOCKET_ERROR) {
-      DWORD err = WSAGetLastError();
-      DWORD e2 = WSAENOTSOCK;
-      Log("unknown error in sendto (erro: %d  wsaerr: %d).\n", res, err);
-      ASSERT(FALSE && "Unknown error in sendto");
-   }
-  // Log("sent packet length %d to %s:%d (ret:%d).\n", len, inet_ntoa(to->sin_addr), ntohs(to->sin_port), res);
 }
 
 bool
@@ -91,22 +52,19 @@ Udp::OnLoopPoll(void *cookie)
 
       // TODO: handle len == 0... indicates a disconnect.
 
-      if (len == -1) {
-         int error = WSAGetLastError();
-         if (error != WSAEWOULDBLOCK) {
-            Log("recvfrom WSAGetLastError returned %d (%x).\n", error, error);
-         }
+      if (len == -1 || connection_id == -1) {
+		  if (connection_id == -1) {
+			  Log("recvfrom returned (len:%d  from: invalid connection).\n", len);
+		  }
          break;
       } else if (len > 0) {
-		 //TODO(erebus): make connection manager return an info string on the connection id.
-         Log("recvfrom returned (len:%d  from:%s:%d).\n", len, inet_ntoa(recv_addr.sin_addr), ntohs(recv_addr.sin_port) );
+         Log("recvfrom returned (len:%d  from: %s).\n", len, _connection_manager->ToString(connection_id) );
          UdpMsg *msg = (UdpMsg *)recv_buf;
          _callbacks->OnMsg(connection_id, msg, len);
       }
    }
    return true;
 }
-
 
 void
 Udp::Log(const char *fmt, ...)

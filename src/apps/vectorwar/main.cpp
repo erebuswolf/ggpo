@@ -131,6 +131,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
    }
 
    UDPConnectionManager connection_manager;
+   connection_manager.Init(local_port);
+
    if (wcscmp(__wargv[offset], L"spectate") == 0) {
       char host_ip[128];
       int host_port;
@@ -138,7 +140,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
          Syntax();
       }
       wcstombs(host_ip, wide_ip_buffer, sizeof(host_ip));
-
 	  int connection_id = connection_manager.AddConnection(host_ip, host_port);
 	  VectorWar_InitSpectator(hwnd, local_port, num_players, connection_id, (ConnectionManager*) &connection_manager);
    } else {

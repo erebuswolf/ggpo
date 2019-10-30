@@ -50,8 +50,6 @@ public:
 
 protected:
    ConnectionManager *_connection_manager;
-   // Network transmission information
-   SOCKET         _socket;
 
    // state management
    Callbacks      *_callbacks;

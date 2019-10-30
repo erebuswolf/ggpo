@@ -201,7 +201,7 @@ GGPOErrorCode ggpo_start_spectating(GGPOSession **session,
 {
    *session= (GGPOSession *)new SpectatorBackend(cb,
                                                  game,
-												 0,
+												 connection_manager,
                                                  local_port,
                                                  num_players,
                                                  input_size,
