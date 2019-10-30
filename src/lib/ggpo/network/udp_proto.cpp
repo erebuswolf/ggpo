@@ -50,7 +50,6 @@ UdpProtocol::UdpProtocol() :
    for (int i = 0; i < ARRAY_SIZE(_peer_connect_status); i++) {
       _peer_connect_status[i].last_frame = -1;
    }
-   memset(&_peer_addr, 0, sizeof _peer_addr);
    _oo_packet.msg = NULL;
 
    char *delay = getenv("ggpo.network.delay");

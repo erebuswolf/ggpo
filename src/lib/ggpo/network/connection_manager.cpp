@@ -69,9 +69,7 @@ int UDPConnectionManager::SendTo(char* buffer, int len, int flags, int connectio
 		Log("Connection not in map Connection ID: %d).\n", connection_id);
 	}
 
-	Log("trying to send %d).\n", connection_map.find(connection_id)->first);
 	std::shared_ptr<ConnectionInfo> dest_addr = connection_map.find(connection_id)->second;
-	Log("trying to send %d).\n", dest_addr->GetInt());
 
 	if ((std::dynamic_pointer_cast <udp_info>(dest_addr)) == NULL) {
 		Log("cast failed).\n");
@@ -98,9 +96,6 @@ int UDPConnectionManager::SendTo(char* buffer, int len, int flags, int connectio
 }
 
 int UDPConnectionManager::RecvFrom(char* buffer, int len, int flags, int* connection_id) {
-	//set the connection id to the connection we recieved the data from.
-
-	// resolve the address via the connection ID
 	
 	sockaddr_in    recv_addr;
 	int            recv_addr_len;
@@ -111,6 +106,7 @@ int UDPConnectionManager::RecvFrom(char* buffer, int len, int flags, int* connec
 	// -1 indicates no data or some other error.
 	int inlen = recvfrom(_socket, (char*)buffer, len, flags, (struct sockaddr*) & recv_addr, &recv_addr_len);
 
+	// Assign connection_id to the id we recieved the data from.
 	*connection_id = FindIDFromIP(&recv_addr);
 
 	// Platform specific error message handling should be done in the connection manager.
@@ -125,7 +121,6 @@ int UDPConnectionManager::RecvFrom(char* buffer, int len, int flags, int* connec
 }
 
 int UDPConnectionManager::FindIDFromIP(sockaddr_in* addr) {
-
 	for (std::map<int, std::shared_ptr<ConnectionInfo>>::iterator it = connection_map.begin();
 		it != connection_map.end();
 		++it) {
@@ -141,16 +136,12 @@ int UDPConnectionManager::FindIDFromIP(sockaddr_in* addr) {
 }
 
 void UDPConnectionManager::Init(int port) {
+	Log("binding udp socket to port %d.\n", port);
 	_socket = CreateSocket(port, 0);
 }
 
 int UDPConnectionManager::AddConnection(char* ip_address, short port) {
-	Log("adding connection start\n");
-	auto connection = BuildConnectionInfo(ip_address, port);
-	Log("building finished\n");
-	int id = ConnectionManager::AddConnection(connection);
-	Log("adding finished\n");
-	return id;
+	return ConnectionManager::AddConnection(BuildConnectionInfo(ip_address, port));
 }
 
 std::string UDPConnectionManager::ToString(int connection_id) {
@@ -174,17 +165,7 @@ UDPConnectionManager::~UDPConnectionManager() {
 }
 
 std::shared_ptr<ConnectionInfo> UDPConnectionManager::BuildConnectionInfo(char* ip_address, short port) {
-	Log("building connection ptr\n");
-	std::shared_ptr<udp_info> ptr= std::make_shared<udp_info>(ip_address, port);
-	if (ptr == NULL) {
-		Log("initial pointer sucks \n");
-	}
-	Log("built a thing %s \n", ptr->ToString().c_str());
-	auto ptr2 = std::static_pointer_cast<ConnectionInfo>(ptr);
-	if (ptr2 == NULL) {
-		Log("pointer cast to parent failed \n");
-	}
-	return ptr2;
+	return std::static_pointer_cast<ConnectionInfo>(std::make_shared<udp_info>(ip_address, port));
 }
 
 //////////////////// STEAM Connection

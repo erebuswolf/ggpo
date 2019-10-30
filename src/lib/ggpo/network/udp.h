@@ -39,7 +39,7 @@ protected:
 public:
    Udp();
 
-   void Init(int port, Poll *p, Callbacks *callbacks, ConnectionManager* connectionManager);
+   void Init(Poll *p, Callbacks *callbacks, ConnectionManager* connectionManager);
    
    void SendTo(char *buffer, int len, int flags, int connection_id /*struct sockaddr *dst, int destlen*/);
 

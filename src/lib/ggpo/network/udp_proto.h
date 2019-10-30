@@ -130,7 +130,6 @@ protected:
    ConnectionManager* connection_manager;
    Udp            *_udp;
    int            _connection_id;
-   sockaddr_in    _peer_addr; 
    uint16         _magic_number;
    int            _queue;
    uint16         _remote_magic_number;
@@ -140,7 +139,6 @@ protected:
    struct {
       int         send_time;
 	  int		  connection_id;
-      sockaddr_in dest_addr;
       UdpMsg*     msg;
    }              _oo_packet;
    RingBuffer<QueueEntry, 64> _send_queue;

@@ -21,14 +21,12 @@ Udp::~Udp(void)
 }
 
 void
-Udp::Init(int port, Poll *poll, Callbacks *callbacks, ConnectionManager* connection_manager)
+Udp::Init(Poll *poll, Callbacks *callbacks, ConnectionManager* connection_manager)
 {
    _callbacks = callbacks;
    _connection_manager = connection_manager;
    _poll = poll;
    _poll->RegisterLoop(this);
-
-   Log("binding udp socket to port %d.\n", port);
 }
 
 void
@@ -42,11 +40,8 @@ bool
 Udp::OnLoopPoll(void *cookie)
 {
    uint8          recv_buf[MAX_UDP_PACKET_SIZE];
-   sockaddr_in    recv_addr;
-   int            recv_addr_len;
 
    for (;;) {
-      recv_addr_len = sizeof(recv_addr);
 	  int connection_id = -1;
 	  int len = _connection_manager->RecvFrom((char*)recv_buf, MAX_UDP_PACKET_SIZE, 0, &connection_id);
 

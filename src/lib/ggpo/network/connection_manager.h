@@ -9,9 +9,7 @@ public:
 	ConnectionInfo() {}
 	void Log(const char* fmt, ...);
 	virtual ~ConnectionInfo() {
-		Log("destruction\n");
 	}
-	virtual int GetInt() { return 5; }
 	virtual std::string ToString() = 0;
 };
 
@@ -55,16 +53,11 @@ public:
 	sockaddr_in addr;
 
 	~udp_info() {
-		Log("upd destruction\n");
 	}
 
 	virtual std::string ToString() {
 		return std::string("UDP");
 	}
-};
-
-class steam_info : ConnectionInfo {
-	/*HSteamNetConnection connection*/
 };
 
 class UDPConnectionManager : public ConnectionManager {
@@ -95,7 +88,11 @@ protected:
 
 };
 
-class SteamConnectionManager : ConnectionManager{
+class steam_info : ConnectionInfo {
+	/*HSteamNetConnection connection*/
+};
+
+class SteamConnectionManager : public ConnectionManager{
 
 public:
 	SteamConnectionManager();
