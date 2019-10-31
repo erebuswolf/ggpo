@@ -4,11 +4,11 @@
 
 
 SOCKET
-CreateSocket(int bind_port, int retries)
+CreateSocket(uint16 bind_port, int retries)
 {
 	SOCKET s;
 	sockaddr_in sin;
-	int port;
+	uint16 port;
 	int optval = 1;
 
 	s = socket(AF_INET, SOCK_DGRAM, 0);
@@ -74,8 +74,7 @@ int UDPConnectionManager::SendTo(char* buffer, int len, int flags, int connectio
 
 	if (res == SOCKET_ERROR) {
 		DWORD err = WSAGetLastError();
-		DWORD e2 = WSAENOTSOCK;
-		Log("unknown error in sendto (erro: %d  wsaerr: %d, Connection ID: %d).\n", res, err, connection_id);
+		Log("unknown error in sendto (erro: %d  wsaerr: %d), Connection ID: %d.\n", res, err, connection_id);
 		ASSERT(FALSE && "Unknown error in sendto");
 	}
 
@@ -125,12 +124,12 @@ int UDPConnectionManager::FindIDFromIP(sockaddr_in* addr) {
 	return -1;
 }
 
-void UDPConnectionManager::Init(int port) {
+void UDPConnectionManager::Init(u_short port) {
 	Log("binding udp socket to port %d.\n", port);
 	_socket = CreateSocket(port, 0);
 }
 
-int UDPConnectionManager::AddConnection(char* ip_address, short port) {
+int UDPConnectionManager::AddConnection(char* ip_address, u_short port) {
 	return ConnectionManager::AddConnection(BuildConnectionInfo(ip_address, port));
 }
 
@@ -141,15 +140,22 @@ UDPConnectionManager::~UDPConnectionManager() {
 	}
 }
 
-std::shared_ptr<ConnectionInfo> UDPConnectionManager::BuildConnectionInfo(char* ip_address, short port) {
+std::shared_ptr<ConnectionInfo> UDPConnectionManager::BuildConnectionInfo(char* ip_address, u_short port) {
 	return std::static_pointer_cast<ConnectionInfo>(std::make_shared<UPDInfo>(ip_address, port));
 }
 
+UPDInfo::UPDInfo(char* ip_address, u_short port) {
+	addr.sin_family = AF_INET;
+	inet_pton(AF_INET, ip_address, &addr.sin_addr.s_addr);
+	addr.sin_port = htons(port);
+}
 
 std::string UPDInfo::ToString() {
+	char dst_ip[1024];
 	char buffer[100];
 	sprintf(buffer, "Connection: IP: %s, Port: %d",
-		inet_ntoa(addr.sin_addr),
-		(addr.sin_port));
+		inet_ntop(AF_INET, (void*)&addr->sin_addr, dst_ip, ARRAY_SIZE(dst_ip)),
+		ntohs(addr->sin_port));
 	return std::string(buffer);
+
 }

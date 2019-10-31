@@ -109,11 +109,7 @@ protected:
 
 class UPDInfo : public ConnectionInfo   {
 public:
-	UPDInfo(char* ip_address, short port) {
-		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = inet_addr(ip_address);
-		addr.sin_port = htons(port);
-	}
+	UPDInfo(char* ip_address, u_short port);
 
 	sockaddr_in addr;
 
@@ -133,14 +129,14 @@ public:
 
 	virtual int RecvFrom(char* buffer, int len, int flags, int* connection_id);
 
-	int AddConnection(char* ip_address, short port);
+	int AddConnection(char* ip_address, u_short port);
 
-	void Init(int port);
+	void Init(u_short port);
 
 	int FindIDFromIP(sockaddr_in* sockaddr);
 
 protected:
-	std::shared_ptr<ConnectionInfo> BuildConnectionInfo(char* ip_address, short port);
+	std::shared_ptr<ConnectionInfo> BuildConnectionInfo(char* ip_address, u_short port);
 
 	sockaddr_in _peer_addr;
 
