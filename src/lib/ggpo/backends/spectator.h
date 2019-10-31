@@ -20,7 +20,7 @@
 
 class SpectatorBackend : public IQuarkBackend, IPollSink, Udp::Callbacks {
 public:
-   SpectatorBackend(GGPOSessionCallbacks *cb, const char *gamename, ConnectionManager* connection_manager, uint16 localport, int num_players, int input_size, int connection_id);
+   SpectatorBackend(GGPOSessionCallbacks *cb, const char *gamename, ConnectionManager* connection_manager, int num_players, int input_size, int connection_id);
    virtual ~SpectatorBackend();
 
 

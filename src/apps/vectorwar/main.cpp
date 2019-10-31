@@ -143,7 +143,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
       }
       wcstombs_s(nullptr, host_ip, ARRAYSIZE(host_ip), wide_ip_buffer, _TRUNCATE);
 	  int connection_id = connection_manager.AddConnection(host_ip, host_port);
-	  VectorWar_InitSpectator(hwnd, local_port, num_players, connection_id, (ConnectionManager*) &connection_manager);
+	  VectorWar_InitSpectator(hwnd, num_players, connection_id, (ConnectionManager*) &connection_manager);
    } else {
       GGPOPlayer players[GGPO_MAX_SPECTATORS + GGPO_MAX_PLAYERS];
 
@@ -191,7 +191,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
          ::SetWindowPos(hwnd, NULL, window_offsets[local_player].x, window_offsets[local_player].y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
       }
 
-      VectorWar_Init(hwnd, local_port, num_players, players, num_spectators, (ConnectionManager*)&connection_manager);
+      VectorWar_Init(hwnd, num_players, players, num_spectators, (ConnectionManager*)&connection_manager);
    }
    RunMainLoop(hwnd);
    VectorWar_Exit();

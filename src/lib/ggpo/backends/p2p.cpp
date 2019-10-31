@@ -14,7 +14,6 @@ static const int DEFAULT_DISCONNECT_NOTIFY_START   = 750;
 Peer2PeerBackend::Peer2PeerBackend(GGPOSessionCallbacks *cb,
                                    const char *gamename,
                                    ConnectionManager* connection_manager,
-                                   uint16 localport,
                                    int num_players,
                                    int input_size) :
     _num_players(num_players),

@@ -42,13 +42,11 @@ ggpo_start_session(GGPOSession **session,
 	ConnectionManager* connection_manager,
                    const char *game,
                    int num_players,
-                   int input_size,
-                   unsigned short localport)
+                   int input_size)
 {
    *session= (GGPOSession *)new Peer2PeerBackend(cb,
                                                  game,
 												 connection_manager,
-                                                 localport,
                                                  num_players,
                                                  input_size);
    return GGPO_OK;
@@ -196,13 +194,11 @@ GGPOErrorCode ggpo_start_spectating(GGPOSession **session,
                                     const char *game,
                                     int num_players,
                                     int input_size,
-                                    unsigned short local_port,
                                     int connection_id)
 {
    *session= (GGPOSession *)new SpectatorBackend(cb,
                                                  game,
                                                  connection_manager,
-                                                 local_port,
                                                  num_players,
                                                  input_size,
                                                  connection_id);

@@ -324,8 +324,7 @@ GGPO_API GGPOErrorCode __cdecl ggpo_start_session(GGPOSession **session,
                                                                ConnectionManager* connection_manager,
                                                                const char *game,
                                                                int num_players,
-                                                               int input_size,
-                                                               unsigned short  localport);
+                                                               int input_size);
 
 
 /*
@@ -406,7 +405,6 @@ GGPO_API GGPOErrorCode __cdecl ggpo_start_spectating(GGPOSession **session,
                                                                   const char *game,
                                                                   int num_players,
                                                                   int input_size,
-                                                                  int local_port,
                                                                   unsigned short connection_id);
 
 /*
